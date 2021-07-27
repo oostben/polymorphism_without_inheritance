@@ -12,31 +12,26 @@ void draw(const int& x, ostream& out, size_t position)
 class object_t 
 {
     public:
-        object_t(const int & x): self_(make_unique<int_model_t>(x)) 
-        { 
-            cout << "ctor" << endl;
-        }
+        //pass ctor arguments by value and move them into place to use our own 
+        object_t(int x): self_(make_unique<int_model_t>(move(x))) { }
 
-        object_t(const object_t& x): self_(make_unique<int_model_t>(*x.self_)) 
+        object_t(const object_t& x): self_(make_unique<int_model_t>(*x.self_)) { }
+
+        //set move constructor to default:
+        object_t(object_t&& x) noexcept = default;
+
+        //add in a move assignment operator:
+        object_t& operator=(const object_t&&) noexcept = default;
+
+        //note: 
+        //  -returning objects from functions, passing read-only arguments, 
+        //  and passing !!rvalues as sink arguments!! do not require copying
+
+        //  -understanding this can greatly iimprove the efficiency of your appolications
+
+        object_t& operator=(object_t x&)
         {
-            cout << "copy" << endl;
-
-        }
-
-        //need to provide our own swap or move constructor, so that swaps workk without going to a temproary
-        //move constructor (&&):
-        //swap is written in terms of move
-        //rvalue
-        object_t(object_t&& x) noexcept : self_(move(x.self_)) 
-        {
-            cout << "move" << endl;
-        }
-
-        object_t& operator=(object_t x) noexcept
-        {
-            cout << "assignment" << endl;
-            self_ = move(x.self_);
-            return *this;
+            return *this = object_t(x);
         }
 
         friend void draw(const object_t& x, ostream& out, size_t position)
@@ -47,7 +42,7 @@ class object_t
     private:
         struct int_model_t
         {
-            int_model_t(const int& x): data_(x) { }
+            int_model_t(int x): data_(x) { }
             void draw_(ostream& out,size_t position) const
             {
                 draw(data_, out, position);
