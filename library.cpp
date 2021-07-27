@@ -12,18 +12,30 @@ void draw(const int& x, ostream& out, size_t position)
 class object_t 
 {
     public:
-        object_t(const int & x): self_(make_unique<int_model_t>(x)) { }
+        object_t(const int & x): self_(make_unique<int_model_t>(x)) 
+        { 
+            cout << "ctor" << endl;
+        }
 
-        //define our own copy constructor, make sure it actually copies the int, copied objects are equal and disjoint
-        object_t(const object_t& x): self_(make_unique<int_model_t>(*x.self_)) { }
-
-        //define our own assignment operator; satisfies the strong exception guarentee -> if we throw object is still in same state if we throw
-        //basic exception guarentee -> still satisfies its invariants, but in an unkown state (we don't have this, we have strong)
-        object_t& operator=(const object_t& x)
+        object_t(const object_t& x): self_(make_unique<int_model_t>(*x.self_)) 
         {
-            //notice, we don't optimize for self assignment, self assignment is rare so we exclude it for optimizing the 99.9% case
-            object_t tmp(x);
-            self_ = move(tmp.self_);
+            cout << "copy" << endl;
+
+        }
+
+        //need to provide our own swap or move constructor, so that swaps workk without going to a temproary
+        //move constructor (&&):
+        //swap is written in terms of move
+        //rvalue
+        object_t(object_t&& x) noexcept : self_(move(x.self_)) 
+        {
+            cout << "move" << endl;
+        }
+
+        object_t& operator=(object_t x) noexcept
+        {
+            cout << "assignment" << endl;
+            self_ = move(x.self_);
             return *this;
         }
 
@@ -33,7 +45,6 @@ class object_t
         }
     
     private:
-        //Private implementation (Pimpl) or handle-body idiom is good for seperating the implementation and reducing compile times
         struct int_model_t
         {
             int_model_t(const int& x): data_(x) { }
