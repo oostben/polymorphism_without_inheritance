@@ -8,7 +8,6 @@ void draw(const int& x, ostream& out, size_t position)
     out << string(position, ' ') << x << endl;
 }
 
-//add in a way to draw a string
 void draw(const string& x, ostream& out, size_t position)
 {
     out << string(position, ' ') << x << endl;
@@ -17,12 +16,10 @@ void draw(const string& x, ostream& out, size_t position)
 class object_t 
 {
     public:
-        //add another constructor for strings:
         object_t(string x): self_(make_unique<string_model_t>(move(x))) { }
 
         object_t(int x): self_(make_unique<int_model_t>(move(x))) { }
 
-        //virtualize copy constructor
         object_t(const object_t& x): self_(x.self_->copy_()) { }
 
         object_t(object_t&& x) noexcept = default;
@@ -40,13 +37,10 @@ class object_t
         }
     
     private:
-        //define concept base class, so we can store whatever we like:
         struct concept_t
         {
             virtual ~concept_t() = default;
-            //virtualize copy:
             virtual unique_ptr<concept_t> copy_() const = 0;
-            //virualize the draw function:
             virtual void draw_(ostream&, size_t) const = 0;
         };
 
@@ -54,7 +48,6 @@ class object_t
         {
             int_model_t(int x): data_(move(x)) { }
 
-            //virtualize copy:
             unique_ptr<concept_t> copy_() const override
             {
                 return make_unique<int_model_t>(*this);
@@ -64,15 +57,14 @@ class object_t
             {
                 draw(data_, out, position);
             }
+
             int data_;
         };
 
-        //add in string support
         struct string_model_t final : concept_t
         {
             string_model_t(string x): data_(move(x)) { }
             
-            //virtualize copy:
             unique_ptr<concept_t> copy_() const override
             {
                 return make_unique<string_model_t>(*this);
@@ -82,10 +74,10 @@ class object_t
             {
                 draw(data_, out, position);
             }
+
             string data_;
         };
 
-        //now store a concept for a drawable object
         unique_ptr<concept_t> self_;
 };
 

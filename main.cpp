@@ -4,7 +4,6 @@ using namespace std;
 
 int main() 
 {
-    //now we can do this!:
     document_t document;
     document.emplace_back(1);
     document.emplace_back(string("Hello"));
