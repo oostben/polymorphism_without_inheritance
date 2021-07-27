@@ -17,19 +17,11 @@ class object_t
 
         object_t(const object_t& x): self_(make_unique<int_model_t>(*x.self_)) { }
 
-        //set move constructor to default:
         object_t(object_t&& x) noexcept = default;
 
-        //add in a move assignment operator:
-        object_t& operator=(const object_t&&) noexcept = default;
+        object_t& operator=(object_t&&) noexcept = default;
 
-        //note: 
-        //  -returning objects from functions, passing read-only arguments, 
-        //  and passing !!rvalues as sink arguments!! do not require copying
-
-        //  -understanding this can greatly iimprove the efficiency of your appolications
-
-        object_t& operator=(object_t x&)
+        object_t& operator=(const object_t& x)
         {
             return *this = object_t(x);
         }
@@ -42,7 +34,7 @@ class object_t
     private:
         struct int_model_t
         {
-            int_model_t(int x): data_(x) { }
+            int_model_t(int x): data_(move(x)) { }
             void draw_(ostream& out,size_t position) const
             {
                 draw(data_, out, position);
