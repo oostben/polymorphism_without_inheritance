@@ -7,5 +7,7 @@
         "random": "cpp",
         "optional": "cpp",
         "iosfwd": "cpp"
-    }
+    },
+    "C_Cpp.loggingLevel": "Debug",
+    "lldb.verboseLogging": true
 }
